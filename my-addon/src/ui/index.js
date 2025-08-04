@@ -7,6 +7,7 @@ addOnUISdk.ready.then(async () => {
     // Get the UI runtime.
     const { runtime } = addOnUISdk.instance;
     const { app, constants } = addOnUISdk;
+    const { ButtonType } = constants;
 
     const sandboxProxy = await runtime.apiProxy("documentSandbox");
 
@@ -72,6 +73,36 @@ addOnUISdk.ready.then(async () => {
             colorPickerBtn.style.setProperty('--hover-color', `rgb(${Math.max(0, r-50)}, ${Math.max(0, g-50)}, ${Math.max(0, b-50)})`);
         }
     });
+
+    const showPremiumContentError = async () => {
+        
+        // Show a modal dialog with an error message
+        const { buttonType } = await app.showModalDialog({
+          variant: "error",
+          title: "Unable to Load Element",
+          description:
+            "Sorry, we were not able to load the element. " +
+            "Some assets are only included in the Premium plan. " +
+            "Try removing all premium assets from the current page " +
+            "or upgrading Adobe Express to a Premium plan. ",
+          buttonLabels: { secondary: "Upgrade" },
+        });
+
+        if (buttonType === constants.ButtonType.cancel) return false;// The User is still not premium
+        if (buttonType === ButtonType.cancel) return false;
+        if (buttonType === ButtonType.secondary) {
+          // Original flow (don't use anymore)
+          // ❌ window.open(
+          //     "https://www.adobe.com/go/express_addons_pricing",
+          //     "_blank"
+          //   );
+          // 👇 Use startPremiumUpgradeIfFreeUser() instead
+          const hasUpgradedToPremium = await app.startPremiumUpgradeIfFreeUser();
+          return hasUpgradedToPremium;
+        }
+      
+        
+    };
     
 
     previewBtn.addEventListener("click", async () => {
@@ -85,9 +116,15 @@ addOnUISdk.ready.then(async () => {
             
             if (pagesMetadata.length > 0 && pagesMetadata[0].hasPremiumContent) {
                 // Check if user is premium
-                const userIsPremium = await app.currentUser.isPremiumUser();
+                let userIsPremium = await app.currentUser.isPremiumUser();
                 if (!userIsPremium) {
-                    throw new Error("Premium content detected. Please ensure there is no premium content on the page that requires a subscription to access.");
+                    const isNowPremiumUser = await showPremiumContentError();
+                    if (isNowPremiumUser) {
+                        userIsPremium = true;
+                    } else {
+                        container.textContent = "Premium content detected. Please upgrade or remove premium content to continue.";
+                        return;
+                    }
                 }
                 // If user is premium, continue with the process
             }

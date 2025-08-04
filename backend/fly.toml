@@ -20,6 +20,6 @@ primary_region = "sjc"
   min_machines_running = 1    # Keep at least 1 running
 
 [machine]
-  memory = "512mb"
+  memory = "1024mb"
   cpu_kind = "shared"
   cpus = 1
