@@ -230,9 +230,10 @@ addOnUISdk.ready.then(async () => {
             container.innerHTML = `<img src="${url}" alt="Canvas preview" style="max-width: 100%; height: auto;" />`;
             clearPreviewBtn.style.display = "block";
             
-            // Enable Mask Image button since we now have a base image
+            // Enable buttons since we now have a base image
             imageBtn.disabled = false;
             maskBtn.disabled = false; // Enable Get Outer Mask button
+            videoBtn.disabled = false; // Enable Outer Image Mask button (repurposed video button)
         };
     });
 
@@ -246,6 +247,7 @@ addOnUISdk.ready.then(async () => {
         }
         imageBtn.disabled = true;
         maskBtn.disabled = true; // Disable Get Outer Mask button
+        videoBtn.disabled = true; // Disable Outer Image Mask button
         clearPreviewBtn.style.display = "none";
     });
 
@@ -518,103 +520,84 @@ addOnUISdk.ready.then(async () => {
         return resultUrl;
     }
 
+    // Temporary: outer mask using a background image (instead of solid color)
+    async function callOuterMaskWithBg(foregroundBlob, backgroundBlob) {
+        const formData = new FormData();
+        formData.append("foreground", foregroundBlob, "fg.png");
+        formData.append("background", backgroundBlob, "bg.png");
+
+        const response = await fetch("http://127.0.0.1:5000/outer-mask-image-with-bg", {
+            method: "POST",
+            body: formData,
+        });
+
+        if (!response.ok) throw new Error("Failed to apply outer image mask");
+
+        const resultBlob = await response.blob();
+        const resultUrl = URL.createObjectURL(resultBlob);
+
+        currentImage = resultBlob;
+        addToCanvasBtn.disabled = false;
+        addToCanvasBtn.hidden = false;
+
+        return resultUrl;
+    }
+
 
     async function addToCanvas(blob) {
-        if(blob.type === "image/png") {
+        if (blob.type === "image/png") {
             await addOnUISdk.app.document.addImage(blob, {
-            title: "Step Image",
-            author: "Your App",
+                title: "Step Image",
+                author: "Your App",
             });
-    } else if(blob.type === "video/mp4") {
-        await addOnUISdk.app.document.addVideo(blob, {
-            title: "Step Video",
-            author: "Your App",
-            });
+        } else if (blob.type === "video/mp4") {
+            // Video support temporarily disabled with mask video functionality
+            console.warn("Video addToCanvas is currently disabled.");
         }
     }
     addToCanvasBtn.addEventListener("click", async () => {
         await addToCanvas(currentImage);
     });
 
-    async function callMaskVideo(foregroundBlob, backgroundBlob) {
-        const formData = new FormData();
-        formData.append("foreground", foregroundBlob, "fg.png");
-        formData.append("background", backgroundBlob, "bg.mp4");
-    
-        const response = await fetch("https://backend-billowing-waterfall-2609.fly.dev/mask-video", {
-            method: "POST",
-            body: formData,
-        });
-
-        if (!response.ok) throw new Error("Failed to apply mask");
-    
-        const resultBlob = await response.blob();
-        const resultUrl = URL.createObjectURL(resultBlob);
-
-        addToCanvasBtn.disabled = false;
-        addToCanvasBtn.hidden = false;
-        currentImage = resultBlob;
-
-        outputContainer.innerHTML = `
-        <video controls autoplay muted style="max-width: 100%; height: auto;">
-            <source src="${resultUrl}" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
-        `;
-    
-        // const img = new Image();
-        // img.src = resultUrl;
-        // document.body.appendChild(img);
-        const video = document.createElement("video");
-        video.controls = true;
-        video.autoplay = true;
-        video.src = resultUrl;
-
-        return resultUrl;
-    }
+    // Mask video functionality temporarily disabled
+    // async function callMaskVideo(foregroundBlob, backgroundBlob) {
+    //     const formData = new FormData();
+    //     formData.append("foreground", foregroundBlob, "fg.png");
+    //     formData.append("background", backgroundBlob, "bg.mp4");
+    // 
+    //     const response = await fetch("https://backend-billowing-waterfall-2609.fly.dev/mask-video", {
+    //         method: "POST",
+    //         body: formData,
+    //     });
+    //
+    //     if (!response.ok) throw new Error("Failed to apply mask");
+    // 
+    //     const resultBlob = await response.blob();
+    //     const resultUrl = URL.createObjectURL(resultBlob);
+    //
+    //     addToCanvasBtn.disabled = false;
+    //     addToCanvasBtn.hidden = false;
+    //     currentImage = resultBlob;
+    //
+    //     outputContainer.innerHTML = `
+    //     <video controls autoplay muted style="max-width: 100%; height: auto;">
+    //         <source src="${resultUrl}" type="video/mp4">
+    //         Your browser does not support the video tag.
+    //     </video>
+    //     `;
+    // 
+    //     const video = document.createElement("video");
+    //     video.controls = true;
+    //     video.autoplay = true;
+    //     video.src = resultUrl;
+    //
+    //     return resultUrl;
+    // }
 
 
 
-    // Masking video
-    videoBtn.addEventListener("click", async () => {
-        console.log("Video clicked");
-        
-        // handle video upload
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'video/*';
-        input.click();
-
-
-        input.onchange = async (e) => {
-            const file = e.target.files[0];
-            console.log(file);
-            if(!file) return;
-
-            // Show loading state
-            outputContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">Masking video...</div>';
-
-            try {
-                // call
-                const result = await callMaskVideo(processedImage, file);
-                const resultBlob = result.blob;
-                console.log("result", result);
-                // container.innerHTML = `<img src="${result}" alt="Canvas preview" />`;
-                // const r = URL.createObjectURL(result);
-                // container.innerHTML = `<img src="${result}" alt="Canvas preview" />`;
-                outputContainer.innerHTML = `<video src="${result}" alt="Canvas preview" autoplay muted />`;
-            } catch (error) {
-                console.error("Error processing video:", error);
-                outputContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #ff0000;">Error processing video. Please try again.</div>';
-            }
-        };
-
-        //execute rest
-
-        console.log("processedImage", processedImage);
-
-        
-    });
+    // Masking video click handler temporarily replaced with outer image mask
+    // videoBtn.addEventListener("click", async () => { ... old video logic ... });
 
     // Create Outter Mask
     maskBtn.addEventListener("click", async () => {
@@ -662,10 +645,47 @@ addOnUISdk.ready.then(async () => {
     
         return resultUrl;
     }
-    
 
+    // Repurpose video button: create outer mask using a background image
+    videoBtn.addEventListener("click", async () => {
+        console.log("Outer image mask (video button) clicked");
 
+        if (!processedImage) {
+            alert("Please load an image first.");
+            return;
+        }
 
+        // Let user pick the background image
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".png,.jpg,.jpeg,image/png,image/jpeg";
+        input.click();
+
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (file.type !== "image/png" && file.type !== "image/jpeg") {
+                alert("Please select a PNG or JPG file only. The selected file type is not supported.");
+                return;
+            }
+
+            const url = URL.createObjectURL(file);
+
+            await showCroppieInterface(url, async (croppedBlob) => {
+                outputContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">Creating outer image mask...</div>';
+
+                try {
+                    const result = await callOuterMaskWithBg(processedImage, croppedBlob);
+                    console.log("outer image mask result", result);
+                    outputContainer.innerHTML = `<img src="${result}" alt="Outer image mask preview" />`;
+                } catch (error) {
+                    console.error("Error creating outer image mask:", error);
+                    outputContainer.innerHTML = '<div style="text-align: center; padding: 20px; color: #ff0000;">Error creating outer image mask. Please try again.</div>';
+                }
+            });
+        };
+    });
     const getSelectedItems = async () => {
         const res = await sandboxProxy.getSelectedItems();
         console.log("result", res);
@@ -730,9 +750,10 @@ addOnUISdk.ready.then(async () => {
         currentBlobUrl = url; // Track the new blob URL
         console.log("url - -", url);
         
-        // Enable Mask Image button since we now have a base image
+        // Enable buttons since we now have a base image
         imageBtn.disabled = false;
         maskBtn.disabled = false; // Enable Get Outer Mask button
+        videoBtn.disabled = false; // Enable Outer Image Mask button
         
         // Show clear button
         clearPreviewBtn.style.display = "block";
