@@ -344,6 +344,7 @@ addOnUISdk.ready.then(async () => {
                         boundary: { width: containerWidth, height: containerHeight },
                         enableOrientation: false, // Disable rotation to keep fixed size
                         enableResize: false, // Disable resize to keep fixed size
+                        enforceBoundary: false, // Allow moving image beyond viewport bounds
                         showZoomer: true,
                         enableZoom: true,
                         mouseWheelZoom: true,
@@ -384,6 +385,7 @@ addOnUISdk.ready.then(async () => {
                     boundary: { width: 300, height: 225 },
                     enableOrientation: false,
                     enableResize: false,
+                    enforceBoundary: false, // Allow moving image beyond viewport bounds
                     showZoomer: true,
                     enableZoom: true,
                     mouseWheelZoom: true,
