@@ -43,20 +43,22 @@
                 MaskMaster
             </h2>
 
+            <!-- Step 1: Choose object -->
             <div>
+                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-1">
+                    1. Choose object
+                </p>
                 <button
                     id="previewCanvasBtn"
                     class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed text-base font-medium mb-3"
                 >
                     Load Element
                 </button>
-                <div class="text-xs text-gray-500 italic mb-2 ml-1">
-                       1. Ensure the element is in front of a white background
-                    <br>
-                       2. If selecting a group, select outer bounding box
-                    <br>
-                       3. Make sure there is no premium content on the page (For free users)
-                </div>
+                <ul class="text-[11px] text-gray-500 mb-3 ml-1 space-y-0.5 list-disc list-inside">
+                    <li>Place your object on a white background.</li>
+                    <li>Select the object or its outer group.</li>
+                    <li>Free users: remove premium assets on the page.</li>
+                </ul>
 
                 <!-- OR Divider -->
                 <div class="flex items-center my-2">
@@ -76,7 +78,7 @@
                 <div style="position: relative;">
                     <div
                         id="selectedElementInfo"
-                        class="p-3 bg-gray-100 rounded-md text-gray-600 text-sm italic break-words"
+                        class="p-3 bg-gray-50 rounded-md text-gray-600 text-xs break-words border border-dashed border-gray-300 min-h-[64px] flex items-center justify-center text-center"
                     >
                         No content selected
                     </div>
@@ -84,21 +86,29 @@
                 </div>
             </div>
 
-            <div class="flex justify-between gap-4 mt-4">
+            <!-- Step 2: Choose mask type -->
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 mt-3 mb-1">
+                2. Choose mask type
+            </p>
+            <div class="flex justify-between gap-4 mt-1">
                 <button
                     id="imageBtn"
-                    class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed text-base font-medium"
+                    class="flex-1 bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed text-base font-medium text-left"
                 >
-                    Mask Image
-                    <span class="text-xs text-blue-200 align-middle ml-1">PNG/JPEG</span>
+                    <div class="text-sm font-semibold tracking-tight">Inner Mask</div>
+                    <div class="text-[11px] text-blue-100 leading-snug mt-1">
+                        Fills <span class="font-semibold">inside</span> your object with an image.
+                    </div>
                 </button>
                 <button
                     id="videoBtn"
-                    class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed text-base font-medium"
+                    class="flex-1 bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed text-base font-medium text-left"
                     disabled
                 >
-                    Outer Image Mask
-                    <span class="text-xs text-blue-200 align-middle ml-1">PNG/JPEG BG</span>
+                    <div class="text-sm font-semibold tracking-tight">Outer Mask</div>
+                    <div class="text-[11px] text-blue-100 leading-snug mt-1">
+                        Fills the area <span class="font-semibold">outside</span> with a background image.
+                    </div>
                 </button>
             </div>
             <!-- <div class="flex items-center my-2">
@@ -123,17 +133,26 @@
                 </button>
 
             </div>
+
+            <!-- Step 3: Add result to canvas -->
+            <p class="text-xs font-semibold uppercase tracking-wide text-gray-500 mt-4 mb-1 leading-tight">
+                3. Add result to canvas
+            </p>
             <div
             id="outputedItem"
-            class="p-3 bg-gray-100 rounded-md text-gray-600 text-sm italic break-words"
+            class="p-3 bg-gray-50 rounded-md text-gray-600 text-xs break-words border border-dashed border-gray-300 min-h-[120px] flex items-center justify-center text-center"
             >
-                Result will be displayed here
-
+                <div>
+                    <div class="font-medium text-gray-700">No result yet</div>
+                    <div class="text-[11px] text-gray-500 mt-0.5">
+                        Run one of the mask actions above to see a preview.
+                    </div>
+                </div>
             </div>      
             
             <button
-            id="addToCanvasBtn"
-            class="w-full bg-green-600 text-white py-1 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 ease-in-out text-base font-medium"
+                id="addToCanvasBtn"
+                class="mt-2 w-full bg-emerald-600 text-white py-2 px-4 rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-opacity-50 transition duration-200 ease-in-out text-sm font-semibold tracking-wide"
             >
                 Add to Canvas
             </button>
