@@ -179,6 +179,36 @@ def outter_mask_image():
     except Exception as e:
         return {"error": str(e)}, 500
 
+@app.route("/outer-mask-image-with-bg", methods=["POST"])
+def outer_mask_image_with_bg():
+    if "foreground" not in request.files or "background" not in request.files:
+        return {"error": "Missing one or more images"}, 400
+
+    fg_file = request.files["foreground"]
+    bg_file = request.files["background"]
+
+    try:
+        object_img = Image.open(fg_file.stream).convert("RGBA")
+        background_img = Image.open(bg_file.stream).convert("RGBA")
+
+        # Match sizes
+        background_img = background_img.resize(object_img.size)
+
+        alpha = object_img.getchannel("A")
+        transparent = Image.new("RGBA", object_img.size, (0, 0, 0, 0))
+
+        # Outer mask: inside object = transparent, outside = background image
+        result = Image.composite(transparent, background_img, alpha)
+
+        img_io = io.BytesIO()
+        result.save(img_io, format="PNG")
+        img_io.seek(0)
+
+        return send_file(img_io, mimetype="image/png")
+
+    except Exception as e:
+        return {"error": str(e)}, 500
+
 
 
 if __name__ == "__main__":
