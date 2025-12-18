@@ -528,7 +528,7 @@ addOnUISdk.ready.then(async () => {
         formData.append("foreground", foregroundBlob, "fg.png");
         formData.append("background", backgroundBlob, "bg.png");
 
-        const response = await fetch("http://127.0.0.1:5000/outer-mask-image-with-bg", {
+        const response = await fetch("https://backend-billowing-waterfall-2609.fly.dev/outer-mask-image-with-bg", {
             method: "POST",
             body: formData,
         });
